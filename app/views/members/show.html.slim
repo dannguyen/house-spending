@@ -1,0 +1,55 @@
+
+h1 = title @member.name
+h2 = @member.tagline
+
+
+div
+  div Time served #{{@member.total_term_length}}
+  ul class="links"
+    - @member.other_source_links.each_pair do |k, url|
+      li = link_to k, url
+
+  
+div class="aggregate"
+  - @member.personnel_records.each do |pr|
+    div class="person"
+      = pr.name
+      ul
+        - pr.history_by_job_title.each_pair do |title, arr|
+          li 
+            => title
+            ul
+              - arr.sort_by{|r| r.start_date}.each do |row|
+                li #{{row.quarter}} #{{row.amount}} #{{row.start_date}} #{{row.end_date}}
+
+  / - YearQuarter.app_range.each do |period|
+  /   div class="period" 
+  /     h3 = period
+  /     - px.select{|k,v| k[0] == period.to_s}.each_pair do |(q, payee_name), amount|
+  /       p = "#{payee_name} - #{amount}"
+
+
+ 
+section class="terms"
+  h2 Terms
+  - @member.terms.each do |term|
+    div class="term"
+      div = term.span
+      - if term.expenditures.count > 0
+        table class="table table-striped"
+          thead
+            tr
+              th Category
+              th Purpose
+              th Payee
+              th Amount
+              th Start Date
+          - term.expenditures.each do |x|
+            tr
+              td = x.category
+              td = x.purpose
+              td = x.payee
+              td = number_to_currency x.amount
+              td = x.start_date
+
+

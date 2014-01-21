@@ -1,0 +1,23 @@
+h2 Members of Congress
+
+p There are #{{@members.count}} of them
+
+table class="table table-striped"
+
+  thead
+    tr
+      th Name
+      th Chamber
+      th Age
+      th State
+      th Party
+      
+  tbody
+    - @members.each do |member|
+    
+      tr
+        td = link_to member.full_name, member
+        td = member.chamber
+        td = member.age
+        td = member.state
+        td = member.party
