@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.0.2'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
-
+gem 'mysql2'
 
 gem 'nokogiri'
 gem 'activerecord-import'
@@ -16,9 +16,12 @@ gem 'chronic'
 gem 'oj'
 gem 'friendly_id' , github: 'norman/friendly_id'
 gem 'meta-tags', :require => 'meta_tags'
+gem "highcharts-rails", "~> 3.0.0"
+
 
 
 group :development, :test do
+  gem 'thin'
   gem 'pry-rails'
   gem 'database_cleaner', '=1.0.1'
 end

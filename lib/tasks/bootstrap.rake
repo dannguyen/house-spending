@@ -3,6 +3,7 @@ namespace :bootstrap do
   namespace :expenditures do
     desc "download the CSV files from Sunlight's site"
     task :download => :environment do
+      require 'open-uri'
       url = 'http://sunlightfoundation.com/tools/expenditures/'
       db_dir = Rails.root.join 'db/data-hold/house-spending/'
       db_dir.mkpath
@@ -19,21 +20,19 @@ namespace :bootstrap do
     desc 'loads into existing expenditures database'
     task :load => :environment do |t, args|
 
-      CSV::Converters[:mytime] = lambda{|s|
-        if s =~ /\d{2}\/\d{2}\/\d{2}/ 
-          Chronic.parse(s)
-        else
-          s
-        end      
-      }
 
       csvs = Dir.glob Rails.root.join 'db/data-hold/house-spending/*.csv'
       csvs.each do |csv_name|
         puts "Reading #{csv_name}"
         arr = []
 
-        CSV.open(csv_name, headers: true, converters: [:mytime], header_converters: ->(h){h.parameterize.underscore}  ).each_with_index do |row, idx|
-          arr << Expenditure.new(row.to_hash)
+        CSV.open(csv_name, headers: true, header_converters: ->(h){h.parameterize.underscore}  ).each_with_index do |row, idx|
+          hsh = row.to_hash
+          hsh['start_date'] = Chronic.parse(hsh['start_date'])
+          hsh['end_date'] = Chronic.parse(hsh['end_date'])
+          hsh['amount'] = Float(hsh['amount'].gsub(/,/, ''))
+
+          arr << Expenditure.new(hsh)
           if idx % 1000 == 0
             puts "\t #{idx} rows loaded"
             Expenditure.import arr

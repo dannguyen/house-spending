@@ -7,12 +7,17 @@ class PersonnelRecord
     @payroll_records = records.where(payee: @name).order(:start_date)
   end
 
-  def history_by_job_title
-    @payroll_records.inject(Hashie::Mash.new{|h,k| h[k] = [] }) do |h, record|
-      h[record.purpose] << record
 
-      h
+  def history_by_job_title
+    @payroll_records.inject(Hash.new{|h,k| h[k] = [] }) do |hsh, record|
+      hsh[record.purpose] << record
+
+      hsh
     end
+  end
+
+  def total_amount
+    @payroll_records.inject(0){|s, r| s += r.amount}
   end
 
 end

@@ -1,23 +1,15 @@
-h2 Members of Congress
+h2 Expenditures of Congress
 
-p There are #{{@members.count}} of them
+p Using the link_to "Sunlight Foundation House Expenditures Data", "http://sunlightfoundation.com/tools/expenditures/"
 
-table class="table table-striped"
+div class="row"
+  - @members.each do |member|
+  
+    div class="col-md-2"
+      div class="member box #{{member.party}}"
+        = link_to image_tag( member.mug_url, :class => 'imgwrap'), member
+        div = link_to member.full_name, member
+        div = member.tagline         
+     
 
-  thead
-    tr
-      th Name
-      th Chamber
-      th Age
-      th State
-      th Party
-      
-  tbody
-    - @members.each do |member|
-    
-      tr
-        td = link_to member.full_name, member
-        td = member.chamber
-        td = member.age
-        td = member.state
-        td = member.party
+

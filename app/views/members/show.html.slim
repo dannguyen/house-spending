@@ -1,26 +1,76 @@
-
-h1 = title @member.name
-h2 = @member.tagline
+p = link_to "Members", "/members"
 
 
-div
-  div Time served #{{@member.total_term_length}}
-  ul class="links"
-    - @member.other_source_links.each_pair do |k, url|
-      li = link_to k, url
+section class="sec"
+  h1 = title "#{@member.name}, #{@member.tagline}"
+  div class="row"
+    div class="col-md-3"
+      
+      = image_tag @member.mug_url
 
+    div class="col-md-9"
+      = render partial: "shared/highcharts/pie", locals: { chart: \ 
+        { series:  [{ name: 'Expenditures', data: @member.expenditures_grouped_total }] } }
+    / note, for demonstration purposes only. Obviously pies are dumb
+
+
+section class="sec"
+  h3 Expenditures, grouped by quarter
+  = render partial: "shared/highcharts/stacked_bar", \ 
+      locals: {  chart: highchart_expenditures_format(@member.expenditures_grouped_quarterly) }
+
+
+section class="sec personnel"
+
+  h3 Periods of Employment
+  table class="table table-striped table-hover"
+    thead
+      tr
+        th Name
+        th Title
+        th class="pay" Pay
+        - YearQuarter.app_range.each do |a|
+          th class="q" = a.to_s =~ /20(\d{2})(Q1)/ ? $1 : ''
+    tbody
+
+
+    - @member.personnel_records.sort_by{|p| p.total_amount }.reverse.each do |person|
+      - history_by_job_title = person.history_by_job_title
+      - history_by_job_title.each_with_index do |x, idx|
+        - title, records = x
+        tr
+          - if idx == 0
+            td class="name" rowspan="#{{history_by_job_title.count}}" = person.name 
+
+          td class="title" = title
+          td class="pay" = number_to_currency(records.inject(0){|s,r| s += r.amount }, precision: 0)
+          / can i render this possibly any slower?...TK
+          - YearQuarter.app_range.each do |q|
+            - has_record = records.find{|r| r.quarter == q.to_s }
+            td class="q #{{"x" if has_record}}"
+
+
+  /   div class="person"
+  /     = pr.name
+  /     ul
+  /       - pr.history_by_job_title.each_pair do |title, arr|
+  /         li 
+  /           => title
+  /           ul
+  /             - arr.sort_by{|r| r.start_date}.each do |row|
+  /               li #{{row.quarter}} #{{row.amount}} #{{row.start_date}} #{{row.end_date}}
   
-div class="aggregate"
-  - @member.personnel_records.each do |pr|
-    div class="person"
-      = pr.name
-      ul
-        - pr.history_by_job_title.each_pair do |title, arr|
-          li 
-            => title
-            ul
-              - arr.sort_by{|r| r.start_date}.each do |row|
-                li #{{row.quarter}} #{{row.amount}} #{{row.start_date}} #{{row.end_date}}
+/ div class="aggregate"
+/   - @member.personnel_records.each do |pr|
+/     div class="person"
+/       = pr.name
+/       ul
+/         - pr.history_by_job_title.each_pair do |title, arr|
+/           li 
+/             => title
+/             ul
+/               - arr.sort_by{|r| r.start_date}.each do |row|
+/                 li #{{row.quarter}} #{{row.amount}} #{{row.start_date}} #{{row.end_date}}
 
   / - YearQuarter.app_range.each do |period|
   /   div class="period" 
@@ -30,26 +80,26 @@ div class="aggregate"
 
 
  
-section class="terms"
-  h2 Terms
-  - @member.terms.each do |term|
-    div class="term"
-      div = term.span
-      - if term.expenditures.count > 0
-        table class="table table-striped"
-          thead
-            tr
-              th Category
-              th Purpose
-              th Payee
-              th Amount
-              th Start Date
-          - term.expenditures.each do |x|
-            tr
-              td = x.category
-              td = x.purpose
-              td = x.payee
-              td = number_to_currency x.amount
-              td = x.start_date
+/ section class="terms"
+/   h2 Terms
+/   - @member.terms.each do |term|
+/     div class="term"
+/       div = term.span
+/       - if term.expenditures.count > 0
+/         table class="table table-striped"
+/           thead
+/             tr
+/               th Category
+/               th Purpose
+/               th Payee
+/               th Amount
+/               th Start Date
+/           - term.expenditures.each do |x|
+/             tr
+/               td = x.category
+/               td = x.purpose
+/               td = x.payee
+/               td = number_to_currency x.amount
+/               td = x.start_date
 
 

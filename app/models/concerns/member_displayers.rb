@@ -5,6 +5,10 @@ module MemberDisplayers
     ((Time.now - birthday) / (60 * 60 * 24 * 365)).floor
   end
 
+  def mug_url
+    "mugs/#{bioguide_id}.jpg"   
+  end
+
   def name
     [chamber_title, first_name, last_name ].join(' ').squeeze(' ')
   end

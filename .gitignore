@@ -15,3 +15,5 @@
 /log/*.log
 /tmp
 /db/data-hold
+.ruby-version
+/app/assets/images

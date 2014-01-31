@@ -8,6 +8,11 @@ ActiveSupport.on_load(:action_controller) do
   wrap_parameters format: [:json] if respond_to?(:wrap_parameters)
 end
 
+
+def permit_all_the_things(hsh)
+  ActionController::Parameters.new(hsh).permit(hsh.keys)
+end
+
 # To enable root element in JSON for ActiveRecord objects.
 # ActiveSupport.on_load(:active_record) do
 #  self.include_root_in_json = true
